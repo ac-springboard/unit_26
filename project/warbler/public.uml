@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>722ae69d-9224-402b-b254-2a038798115f.SCHEMA:unit_26.public</OriginalElement>
+  <nodes>
+    <node x="124.5" y="-127.0">722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.messages</node>
+    <node x="511.5" y="16.5">722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.likes</node>
+    <node x="-278.5" y="-124.5">722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.follows</node>
+    <node x="116.5" y="209.0">722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.users</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.follows" target="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.users">
+      <point x="-4.926476194933272" y="-0.8543022303352359" />
+      <point x="-4.926476194933272" y="-0.8543022303352501" />
+    </edge>
+    <edge source="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.likes" target="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.users">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.likes" target="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.messages">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.messages" target="722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.users">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Orthogonal" zoom="1.0" x="225.0" y="172.0" />
+  <SelectedNodes>
+    <node>722ae69d-9224-402b-b254-2a038798115f.TABLE:unit_26.public.follows</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+
