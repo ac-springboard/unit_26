@@ -1,11 +1,12 @@
 import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g, url_for
-from flask_debugtoolbar import DebugToolbarExtension
+# from fromflask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, connect_db, User, Message
+from decorators import authenticated
 
 CURR_USER_KEY = "curr_user"
 
@@ -19,9 +20,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -54,7 +55,7 @@ def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
 
     if CURR_USER_KEY in session:
-        g.user = User.query.get(session[CURR_USER_KEY])
+        g.user = User.query.get(session[CURR_USER_KEY])  # Almir: this stores a full 'user object' into the globals
 
     else:
         g.user = None
@@ -139,9 +140,16 @@ def logout():
     return redirect(url_for('login'))
 
 
-##############################################################################
+######################################################################
 # General user routes:
 
+######################################################################
+# General user routes:
+
+######################################################################
+# General user routes:
+######################################################################
+#                                                           LIST USERS
 @app.route('/users')
 def list_users():
     """Page with listing of users.
@@ -159,7 +167,10 @@ def list_users():
     return render_template('users/index.html', users=users)
 
 
+######################################################################
+#                                                            SHOW USER
 @app.route('/users/<int:user_id>')
+@authenticated
 def users_show(user_id):
     """Show user profile."""
 
@@ -176,37 +187,46 @@ def users_show(user_id):
     return render_template('users/show.html', user=user, messages=messages)
 
 
+######################################################################
+#                                                            FOLLOWING
 @app.route('/users/<int:user_id>/following')
+@authenticated
 def show_following(user_id):
     """Show list of people this user is following."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    # if not g.user:
+    #     flash("Access unauthorized.", "danger")
+    #     return redirect("/")
 
     user = User.query.get_or_404(user_id)
     return render_template('users/following.html', user=user)
 
 
+######################################################################
+#                                                            FOLLOWERS
 @app.route('/users/<int:user_id>/followers')
+@authenticated
 def users_followers(user_id):
     """Show list of followers of this user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    # if not g.user:
+    #     flash("Access unauthorized.", "danger")
+    #     return redirect("/")
 
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
 
 
+######################################################################
+#                                                               FOLLOW
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
+@authenticated
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
+    # if not g.user:
+    #     flash("Access unauthorized.", "danger")
+    #     return redirect("/")
 
     followed_user = User.query.get_or_404(follow_id)
     g.user.following.append(followed_user)
@@ -215,7 +235,10 @@ def add_follow(follow_id):
     return redirect(f"/users/{g.user.id}/following")
 
 
+######################################################################
+#                                                       STOP FOLLOWING
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
+@authenticated
 def stop_following(follow_id):
     """Have currently-logged-in-user stop following this user."""
 
@@ -230,13 +253,32 @@ def stop_following(follow_id):
     return redirect(f"/users/{g.user.id}/following")
 
 
+######################################################################
+#                                                         VIEW PROFILE
 @app.route('/users/profile', methods=["GET", "POST"])
+@authenticated
 def profile():
     """Update profile for current user."""
-
+    if True:
+        return redirect(url_for('homepage'))
     # IMPLEMENT THIS
+    return redirect('/login')
 
 
+######################################################################
+#                                                                 EDIT
+@app.route('/users/profile', methods=["GET", "POST"])
+@authenticated
+def profile():
+    """Update profile for current user."""
+    if True:
+        return redirect(url_for('homepage'))
+    # IMPLEMENT THIS
+    return redirect('/login')
+
+
+######################################################################
+#                                                               DELETE
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
     """Delete user."""
@@ -253,9 +295,14 @@ def delete_user():
     return redirect("/signup")
 
 
-##############################################################################
+######################################################################
 # Messages routes:
-
+######################################################################
+# Messages routes:
+######################################################################
+# Messages routes:
+######################################################################
+#                                                                  NEW
 @app.route('/messages/new', methods=["GET", "POST"])
 def messages_add():
     """Add a message:
