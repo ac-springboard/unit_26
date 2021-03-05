@@ -1,7 +1,7 @@
 /* ====================== General */
 
-body {
-  background-color: #e6ecf0;
+htm, body {
+  background-color: #555555;
 }
 
 body.error-404 {

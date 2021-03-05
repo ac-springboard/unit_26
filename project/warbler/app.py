@@ -3,6 +3,9 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g, url_for
 # from fromflask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+from werkzeug.datastructures import MultiDict
+from wtforms import Form
+from wtforms_sqlalchemy.orm import model_form
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, connect_db, User, Message
@@ -254,27 +257,37 @@ def stop_following(follow_id):
 
 
 ######################################################################
-#                                                         VIEW PROFILE
-@app.route('/users/profile', methods=["GET", "POST"])
-@authenticated
-def profile():
-    """Update profile for current user."""
-    if True:
-        return redirect(url_for('homepage'))
-    # IMPLEMENT THIS
-    return redirect('/login')
-
-
-######################################################################
 #                                                                 EDIT
 @app.route('/users/profile', methods=["GET", "POST"])
 @authenticated
 def profile():
     """Update profile for current user."""
-    if True:
-        return redirect(url_for('homepage'))
-    # IMPLEMENT THIS
-    return redirect('/login')
+    UPF = model_form(User, db.session,
+                     exclude=['messages', 'followers', 'following', 'likes'])
+    # UPF=model_form(User, db.session)
+    if request.method == 'GET':
+        form = UPF(MultiDict(), g.user)
+        form.password.data = ''
+        return render_template('users/edit.html',
+                               form=form)
+    else:
+        form = UPF(request.form, obj=g.user)
+        if form.validate():
+            if User.authenticate(g.user.username, form.password.data):
+                user = User.query.get_or_404(g.user.id)
+                pwd = user.password
+                form.populate_obj(user)
+                user.password = pwd
+                db.session.add(user)
+                db.session.commit()
+                return redirect(url_for('users_show', user_id=user.id))
+            flash(u'Invalid Password', category='danger')
+            return render_template('users/edit.html',
+                                   form=form)
+        else:
+            flash(u'Validation Problem', category='danger')
+            return render_template('users/edit.html',
+                                   form=form)
 
 
 ######################################################################
@@ -390,3 +403,7 @@ def add_header(req):
     req.headers["Expires"] = "0"
     req.headers['Cache-Control'] = 'public, max-age=0'
     return req
+
+
+if __name__ == '__main__':
+    app.run()
