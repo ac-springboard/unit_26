@@ -3,50 +3,35 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g, url_for
 # from fromflask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-from werkzeug.datastructures import MultiDict
-from wtforms import Form
-from wtforms_sqlalchemy.orm import model_form
+# from werkzeug.datastructures import MultiDict
+# from wtforms import Form
+# from wtforms_sqlalchemy.orm import model_form
+from flask_wtf.csrf import CSRFProtect
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, UserProfileForm
 from models import db, connect_db, User, Message
 from decorators import authenticated
 
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
+app.config.from_object('config.ConfigDev')
 
-# Get DB_URI from environ variable (useful for production/testing) or,
-# if not set there, use development local db.
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    # os.environ.get('DATABASE_URL', 'jdbc:mysql://localhost:3306/unit_26'))
-    os.environ.get('DATABASE_URL', 'mysql+pymysql://acampos:root@localhost:3306/unit_26'))
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
-# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-# toolbar = DebugToolbarExtension(app)
+# # Get DB_URI from environ variable (useful for production/testing) or,
+# # if not set there, use development local db.
+# app.config['SQLALCHEMY_DATABASE_URI'] = (
+#     # os.environ.get('DATABASE_URL', 'jdbc:mysql://localhost:3306/unit_26'))
+#     os.environ.get('DATABASE_URL', 'mysql+pymysql://acampos:root@localhost:3306/unit_26'))
+#
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SQLALCHEMY_ECHO'] = False
+# # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
+# # toolbar = DebugToolbarExtension(app)
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 connect_db(app)
-
-
-# from csv import DictReader
-# from app import db
-# from models import User, Message, Follows
-#
-# db.drop_all()
-# db.create_all()
-#
-# with open('generator/users.csv') as users:
-#     db.session.bulk_insert_mappings(User, DictReader(users))
-#
-# with open('generator/messages.csv') as messages:
-#     db.session.bulk_insert_mappings(Message, DictReader(messages))
-#
-# with open('generator/follows.csv') as follows:
-#     db.session.bulk_insert_mappings(Follows, DictReader(follows))
-#
-# db.session.commit()
 
 
 ##############################################################################
@@ -262,17 +247,12 @@ def stop_following(follow_id):
 @authenticated
 def profile():
     """Update profile for current user."""
-    UPF = model_form(User, db.session,
-                     exclude=['messages', 'followers', 'following', 'likes'])
-    # UPF=model_form(User, db.session)
+    form = UserProfileForm()
     if request.method == 'GET':
-        form = UPF(MultiDict(), g.user)
-        form.password.data = ''
         return render_template('users/edit.html',
                                form=form)
     else:
-        form = UPF(request.form, obj=g.user)
-        if form.validate():
+        if form.validate_on_submit():
             if User.authenticate(g.user.username, form.password.data):
                 user = User.query.get_or_404(g.user.id)
                 pwd = user.password
@@ -289,6 +269,39 @@ def profile():
             return render_template('users/edit.html',
                                    form=form)
 
+# ######################################################################
+# #                                                                 EDIT
+# @app.route('/users/profile', methods=["GET", "POST"])
+# @authenticated
+# def profile():
+#     """Update profile for current user."""
+#     UPF = model_form(User, db.session,
+#                      exclude=['messages', 'followers', 'following', 'likes'])
+#     # UPF=model_form(User, db.session)
+#     if request.method == 'GET':
+#         form = UPF(MultiDict(), g.user)
+#         form.password.data = ''
+#         return render_template('users/edit.html',
+#                                form=form)
+#     else:
+#         form = UPF(request.form, obj=g.user)
+#         if form.validate():
+#             if User.authenticate(g.user.username, form.password.data):
+#                 user = User.query.get_or_404(g.user.id)
+#                 pwd = user.password
+#                 form.populate_obj(user)
+#                 user.password = pwd
+#                 db.session.add(user)
+#                 db.session.commit()
+#                 return redirect(url_for('users_show', user_id=user.id))
+#             flash(u'Invalid Password', category='danger')
+#             return render_template('users/edit.html',
+#                                    form=form)
+#         else:
+#             flash(u'Validation Problem', category='danger')
+#             return render_template('users/edit.html',
+#                                    form=form)
+#
 
 ######################################################################
 #                                                               DELETE
