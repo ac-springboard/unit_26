@@ -31,6 +31,9 @@ class LoginForm(FlaskForm):
 #     email = EmailField('Email Address', validators=[DataRequired(), Email()])
 
 class UserProfileForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     id = HiddenField()
     email = StringField('Email', [Email(message=('Invalid email address.')), DataRequired(message=('Email address is required.'))])
     username = StringField('Username', [DataRequired(message=('Username is required.'))])

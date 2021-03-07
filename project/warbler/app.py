@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g, 
 # from werkzeug.datastructures import MultiDict
 # from wtforms import Form
 # from wtforms_sqlalchemy.orm import model_form
-from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 # from fromflask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -27,8 +27,8 @@ app.config.from_object('config.ConfigDev')
 # # app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 # # toolbar = DebugToolbarExtension(app)
-csrf = CSRFProtect()
-csrf.init_app(app)
+# csrf = CSRFProtect()
+# csrf.init_app(app)
 
 connect_db(app)
 
