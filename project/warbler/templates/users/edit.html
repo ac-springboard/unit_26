@@ -8,8 +8,8 @@
 			<h2 class="join-message">Edit Your Profile.</h2>
 			<form novalidate class='profile-form' method="POST"
 						id="user_form">
+				{{ form.csrf_token }}
 				<fieldset class="form-field">
-					{{ form.csrf_token }}
 					{{ form.email.label }}
 					{{ form.email(size=20) }}
 					{{ form_errors(form.email) }}

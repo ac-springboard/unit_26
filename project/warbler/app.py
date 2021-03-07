@@ -1,16 +1,15 @@
-import os
-
 from flask import Flask, render_template, request, flash, redirect, session, g, url_for
-# from fromflask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy.exc import IntegrityError
 # from werkzeug.datastructures import MultiDict
 # from wtforms import Form
 # from wtforms_sqlalchemy.orm import model_form
 from flask_wtf.csrf import CSRFProtect
+# from fromflask_debugtoolbar import DebugToolbarExtension
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
+from decorators import authenticated
 from forms import UserAddForm, LoginForm, MessageForm, UserProfileForm
 from models import db, connect_db, User, Message
-from decorators import authenticated
 
 CURR_USER_KEY = "curr_user"
 
@@ -38,6 +37,7 @@ connect_db(app)
 # User signup/login/logout
 
 
+# noinspection PyUnresolvedReferences
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global."""
@@ -148,6 +148,7 @@ def list_users():
     search = request.args.get('q')
 
     if not search:
+        # noinspection PyUnresolvedReferences
         users = User.query.all()
     else:
         users = User.query.filter(User.username.like(f"%{search}%")).all()
@@ -269,6 +270,7 @@ def profile():
             return render_template('users/edit.html',
                                    form=form)
 
+
 # ######################################################################
 # #                                                                 EDIT
 # @app.route('/users/profile', methods=["GET", "POST"])
@@ -388,13 +390,28 @@ def homepage():
     """
 
     if g.user:
-        messages = (Message
-                    .query
-                    .order_by(Message.timestamp.desc())
-                    .limit(100)
-                    .all())
+        # messages = (Message
+        #             .query
+        #             .order_by(Message.timestamp.desc())
+        #             .limit(100)
+        #             .all())
 
-        return render_template('home.html', messages=messages)
+        sql_query_str = """
+            select * from messages m
+                where m.user_id = :search_user_id or m.user_id in (
+                    select f.user_being_followed_id as fd 
+                    from follows f
+                    where f.user_following_id = :search_user_id
+            )
+            order by m.timestamp desc
+            limit 100"""
+
+        # noinspection SqlAlchemyUnsafeQuery
+        sql_query_text = text(sql_query_str).bindparams(search_user_id=g.user.id)
+        sql_query_stmt = Message.query.from_statement(sql_query_text)
+        result = sql_query_stmt.all()
+
+        return render_template('home.html', messages=result)
 
     else:
         return render_template('home-anon.html')
