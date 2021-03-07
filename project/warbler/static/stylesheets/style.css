@@ -565,19 +565,19 @@ p.card-bio {
 	border: 2px solid dodgerblue;
 	}
 
-form input[type="submit"] {
+.profile-form input[type="submit"] {
 	border-radius : 0.2em;
 	width         : 50% !important;
 	}
 
-form {
+.profile-form {
 	width            : min-content;
 	background-color : #ffffff !important;
 	border-radius    : 0.2em;
 	padding: 1em;
 	}
 
-.errors{
+.form-errors{
 	font-size: 0.8em;
 	color: red;
 	}

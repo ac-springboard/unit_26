@@ -1,10 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Email, Length
-from wtforms_alchemy import ModelForm
-from wtforms_components import EmailField
-
-from models import User
 
 
 class MessageForm(FlaskForm):
@@ -35,8 +31,11 @@ class LoginForm(FlaskForm):
 #     email = EmailField('Email Address', validators=[DataRequired(), Email()])
 
 class UserProfileForm(FlaskForm):
+    id = HiddenField()
     email = StringField('Email', [Email(message=('Invalid email address.')), DataRequired(message=('Email address is required.'))])
     username = StringField('Username', [DataRequired(message=('Username is required.'))])
     image_url = StringField('(Optional) Image URL')
+    header_image_url = StringField('(Optional) Header Image URL')
+    bio = StringField('(Optional) Header Image URL')
+    password = PasswordField('Password', [DataRequired(message=('Password is required.'))])
     submit = SubmitField('Submit')
-    password = HiddenField()

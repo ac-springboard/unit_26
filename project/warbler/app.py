@@ -247,7 +247,7 @@ def stop_following(follow_id):
 @authenticated
 def profile():
     """Update profile for current user."""
-    form = UserProfileForm()
+    form = UserProfileForm(obj=g.user)
     if request.method == 'GET':
         return render_template('users/edit.html',
                                form=form)
