@@ -183,10 +183,6 @@ def users_show(user_id):
 def show_following(user_id):
     """Show list of people this user is following."""
 
-    # if not g.user:
-    #     flash("Access unauthorized.", "danger")
-    #     return redirect("/")
-
     user = User.query.get_or_404(user_id)
     return render_template('users/following.html', user=user)
 
@@ -212,10 +208,6 @@ def users_followers(user_id):
 @authenticated
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
-
-    # if not g.user:
-    #     flash("Access unauthorized.", "danger")
-    #     return redirect("/")
 
     followed_user = User.query.get_or_404(follow_id)
     g.user.following.append(followed_user)
@@ -270,40 +262,6 @@ def profile():
             return render_template('users/edit.html',
                                    form=form)
 
-
-# ######################################################################
-# #                                                                 EDIT
-# @app.route('/users/profile', methods=["GET", "POST"])
-# @authenticated
-# def profile():
-#     """Update profile for current user."""
-#     UPF = model_form(User, db.session,
-#                      exclude=['messages', 'followers', 'following', 'likes'])
-#     # UPF=model_form(User, db.session)
-#     if request.method == 'GET':
-#         form = UPF(MultiDict(), g.user)
-#         form.password.data = ''
-#         return render_template('users/edit.html',
-#                                form=form)
-#     else:
-#         form = UPF(request.form, obj=g.user)
-#         if form.validate():
-#             if User.authenticate(g.user.username, form.password.data):
-#                 user = User.query.get_or_404(g.user.id)
-#                 pwd = user.password
-#                 form.populate_obj(user)
-#                 user.password = pwd
-#                 db.session.add(user)
-#                 db.session.commit()
-#                 return redirect(url_for('users_show', user_id=user.id))
-#             flash(u'Invalid Password', category='danger')
-#             return render_template('users/edit.html',
-#                                    form=form)
-#         else:
-#             flash(u'Validation Problem', category='danger')
-#             return render_template('users/edit.html',
-#                                    form=form)
-#
 
 ######################################################################
 #                                                               DELETE
@@ -389,14 +347,9 @@ def homepage():
     - logged in: 100 most recent messages of followed_users
     """
 
-    if g.user:
-        # messages = (Message
-        #             .query
-        #             .order_by(Message.timestamp.desc())
-        #             .limit(100)
-        #             .all())
-
-        sql_query_str = """
+    if not g.user:
+        return render_template('home-anon.html')
+    sql_query_str = """
             select * from messages m
                 where m.user_id = :search_user_id or m.user_id in (
                     select f.user_being_followed_id as fd 
@@ -406,15 +359,35 @@ def homepage():
             order by m.timestamp desc
             limit 100"""
 
-        # noinspection SqlAlchemyUnsafeQuery
-        sql_query_text = text(sql_query_str).bindparams(search_user_id=g.user.id)
-        sql_query_stmt = Message.query.from_statement(sql_query_text)
-        result = sql_query_stmt.all()
+    # noinspection SqlAlchemyUnsafeQuery
+    sql_query_text = text(sql_query_str).bindparams(search_user_id=g.user.id)
+    sql_query_stmt = Message.query.from_statement(sql_query_text)
+    result = sql_query_stmt.all()
 
-        return render_template('home.html', messages=result)
+    return render_template('home.html', messages=result)
 
-    else:
-        return render_template('home-anon.html')
+
+@app.route('/users')
+@authenticated
+def users_view():
+    users = User.query.all()
+    return render_template('users/users.html', users=users, user=g.user)
+
+
+@app.route('/warbles')
+@authenticated
+def warbles_view():
+    sql_query_str = """
+            select * from messages m
+            order by m.timestamp desc
+            """
+
+    # noinspection SqlAlchemyUnsafeQuery
+    sql_query_text = text(sql_query_str)
+    sql_query_stmt = Message.query.from_statement(sql_query_text)
+    result = sql_query_stmt.all()
+
+    return render_template('home.html', messages=result)
 
 
 ##############################################################################

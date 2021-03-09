@@ -25,11 +25,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[Length(min=6)])
 
 
-# class UserProfileForm(ModelForm):
-#     class Meta:
-#         model = User
-#     email = EmailField('Email Address', validators=[DataRequired(), Email()])
-
 class UserProfileForm(FlaskForm):
     class Meta:
         csrf = False

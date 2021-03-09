@@ -509,10 +509,11 @@ p.card-bio {
 	}
 
 #messages-form {
-	position : absolute;
-	top      : 4px;
-	right    : 4px;
+	/*position : absolute;*/
+	/*top      : 4px;*/
+	/*right    : 4px;*/
 	z-index  : 1;
+	/*display: inline-block;*/
 	}
 
 .single-message {
@@ -520,6 +521,10 @@ p.card-bio {
 	line-height    : 32px;
 	letter-spacing : 0.01em;
 	margin-bottom  : 10px;
+	}
+
+.ml-auto {
+	/*display: inline-block;*/
 	}
 
 /* ================================ 404 page */
