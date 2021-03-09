@@ -390,6 +390,23 @@ def warbles_view():
     return render_template('home.html', messages=result)
 
 
+@app.route('/users/add_like/<int:msg_id>', methods=['POST'])
+@authenticated
+def add_like(msg_id):
+    msg = Message.query.get_or_404(msg_id)
+    g.user.likes.append(msg)
+    db.session.commit()
+    messages = g.user.likes
+    return render_template('users/likes.html', messages=messages, user=g.user)
+
+
+@app.route('/users/<int:user_id>/likes')
+@authenticated
+def user_likes(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template('users/likes.html', user=user)
+
+
 ##############################################################################
 # Turn off all caching in Flask
 #   (useful for dev; in production, this kind of stuff is typically

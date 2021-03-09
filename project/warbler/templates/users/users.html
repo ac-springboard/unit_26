@@ -1,40 +1,47 @@
 {% extends 'users/detail.html' %}
 {% block user_details %}
-  <div class="col-sm-9">
-    <div class="row">
+	<div class="col-sm-9">
+		<div class="row">
 
-      {% for u in users %}
+			{% for u in users %}
 
-        <div class="col-lg-4 col-md-6 col-12">
-          <div class="card user-card">
-            <div class="card-inner">
-              <div class="image-wrapper">
-                <img src="{{ u.header_image_url }}" alt="" class="card-hero">
-              </div>
-              <div class="card-contents">
-                <a href="/users/{{ u.id }}" class="card-link">
-                  <img src="{{ u.image_url }}" alt="Image for {{ u.username }}" class="card-image">
-                  <p>@{{ u.username }}</p>
-                </a>
-                {% if g.user.is_following(u) %}
-                  <form method="POST"
-                        action="/users/stop-following/{{ u.id }}">
-                    <button class="btn btn-primary btn-sm">Unfollow</button>
-                  </form>
-                {% else %}
-                  <form method="POST" action="/users/follow/{{ u.id }}">
-                    <button class="btn btn-outline-primary btn-sm">Follow</button>
-                  </form>
-                {% endif %}
+				<div class="col-lg-4 col-md-6 col-12">
+					<div class="card user-card">
+						<div class="card-inner">
+							<div class="image-wrapper">
+								<img src="{{ u.header_image_url }}" alt=""
+										 class="card-hero">
+							</div>
+							<div class="card-contents">
+								<a href="/users/{{ u.id }}" class="card-link">
+									<img src="{{ u.image_url }}"
+											 alt="Image for {{ u.username }}"
+											 class="card-image">
+									<p>@{{ u.username }}</p>
+								</a>
+								{% if g.user.is_following(u) %}
+									<form method="POST"
+												action="/users/stop-following/{{ u.id }}">
+										<button class="btn btn-primary btn-sm">Unfollow
+										</button>
+									</form>
+								{% else %}
+									<form method="POST"
+												action="/users/follow/{{ u.id }}">
+										<button class="btn btn-outline-primary btn-sm">
+											Follow
+										</button>
+									</form>
+								{% endif %}
 
-              </div>
-              <p class="card-bio">{{ u.bio }}</p>
-            </div>
-          </div>
-        </div>
+							</div>
+							<p class="card-bio">{{ u.bio }}</p>
+						</div>
+					</div>
+				</div>
 
-      {% endfor %}
+			{% endfor %}
 
-    </div>
-  </div>
+		</div>
+	</div>
 {% endblock %}
